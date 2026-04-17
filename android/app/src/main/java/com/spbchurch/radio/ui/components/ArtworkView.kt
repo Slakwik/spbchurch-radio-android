@@ -139,7 +139,8 @@ fun DottedProgressRing(
     val active = activeColor ?: colors.accent
     val inactive = inactiveColor ?: colors.textSecondary.copy(alpha = 0.3f)
 
-    Canvas(modifier = modifier.size((dotSize.value + spacing.value) * dotCount)) {
+    val canvasSize = (dotSize.value + spacing.value) * dotCount
+    Canvas(modifier = modifier.size(canvasSize.dp)) {
         val centerX = size.width / 2
         val centerY = size.height / 2
         val radius = (size.width - dotSize.toPx()) / 2

@@ -241,10 +241,12 @@ fun SettingsScreen() {
             onDismissRequest = { showHelpDialog = false },
             title = { Text(stringResource(R.string.help)) },
             text = {
-                Column(verticalScroll = rememberScrollState()) {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
                     HelpSection("Радио", "Нажмите кнопку Play для начала воспроизведения эфира. Название текущего трека отображается на экране.")
                     HelpSection("Треки", "Просматривайте каталог, используйте поиск и сортировку. Нажмите на трек для воспроизведения.")
-                    HelpSection("Избранное", "Добавляйте треки в избранное, нажимая на сердечко. Свайп влево для удаления.")
+                    HelpSection("Избранное", "Добавляйте треки в избранное, нажимая на сердечко.")
                     HelpSection("Загрузки", "Скачивайте треки для прослушивания без интернета. Загруженные треки доступны офлайн.")
                     HelpSection("Плеер", "Мини-плеер внизу экрана позволяет управлять воспроизведением. Нажмите на него для полноэкранного режима.")
                 }
