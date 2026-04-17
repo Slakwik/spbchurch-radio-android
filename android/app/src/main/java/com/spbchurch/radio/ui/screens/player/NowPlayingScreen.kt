@@ -24,6 +24,7 @@ import com.spbchurch.radio.ui.components.*
 import com.spbchurch.radio.ui.theme.Theme
 import com.spbchurch.radio.viewmodel.MainViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NowPlayingScreen(
     viewModel: MainViewModel,
@@ -226,7 +227,7 @@ fun NowPlayingScreen(
                     val orderIcon = when (currentOrder) {
                         PlaybackOrder.SHUFFLE -> Icons.Default.Shuffle
                         PlaybackOrder.REPEAT -> Icons.Default.Repeat
-                        PlaybackOrder.PLAY_ONCE -> Icons.Default.RepeatOnOne
+                        PlaybackOrder.PLAY_ONCE -> Icons.Default.RepeatOne
                     }
 
                     Icon(
