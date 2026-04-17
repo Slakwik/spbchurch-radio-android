@@ -5,6 +5,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -84,9 +93,9 @@ fun PlayButtonM3(
     ) {
         Icon(
             imageVector = if (isPlaying) {
-                androidx.compose.material.icons.Icons.Default.Pause
+                Icons.Default.Pause
             } else {
-                androidx.compose.material.icons.Icons.Default.PlayArrow
+                Icons.Default.PlayArrow
             },
             contentDescription = if (isPlaying) "Пауза" else "Воспроизвести",
             modifier = Modifier.size(size / 2)
@@ -143,9 +152,9 @@ fun TrackRowM3(
             IconButton(onClick = onFavorite) {
                 Icon(
                     imageVector = if (isFavorite) {
-                        androidx.compose.material.icons.Icons.Default.Favorite
+                        Icons.Default.Favorite
                     } else {
-                        androidx.compose.material.icons.Icons.Default.FavoriteBorder
+                        Icons.Default.FavoriteBorder
                     },
                     contentDescription = if (isFavorite) "Убрать из избранного" else "В избранное",
                     tint = if (isFavorite) colors.primary else colors.onSurfaceVariant
@@ -162,9 +171,9 @@ fun TrackRowM3(
             IconButton(onClick = onPlay) {
                 Icon(
                     imageVector = if (isCurrentTrack && isPlaying) {
-                        androidx.compose.material.icons.Icons.Default.Pause
+                        Icons.Default.Pause
                     } else {
-                        androidx.compose.material.icons.Icons.Default.PlayArrow
+                        Icons.Default.PlayArrow
                     },
                     contentDescription = "Воспроизвести",
                     tint = if (isCurrentTrack) colors.primary else colors.onSurfaceVariant,
@@ -189,7 +198,7 @@ fun DownloadButtonM3(
         com.spbchurch.radio.data.model.DownloadState.None -> {
             IconButton(onClick = onDownload) {
                 Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.Download,
+                    imageVector = Icons.Default.Download,
                     contentDescription = "Скачать",
                     tint = colors.onSurfaceVariant
                 )
@@ -201,14 +210,14 @@ fun DownloadButtonM3(
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(
-                    progress = { progress },
+                    progress = progress,
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp,
                     color = colors.primary,
                 )
                 IconButton(onClick = onCancel) {
                     Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Default.Close,
+                        imageVector = Icons.Default.Close,
                         contentDescription = "Отменить",
                         tint = colors.onSurfaceVariant,
                         modifier = Modifier.size(16.dp)
@@ -218,7 +227,7 @@ fun DownloadButtonM3(
         }
         com.spbchurch.radio.data.model.DownloadState.Downloaded -> {
             Icon(
-                imageVector = androidx.compose.material.icons.Icons.Default.CheckCircle,
+                imageVector = Icons.Default.CheckCircle,
                 contentDescription = "Загружено",
                 tint = colors.tertiary,
                 modifier = Modifier
@@ -229,7 +238,7 @@ fun DownloadButtonM3(
         com.spbchurch.radio.data.model.DownloadState.Failed -> {
             IconButton(onClick = onDownload) {
                 Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.Error,
+                    imageVector = Icons.Default.Error,
                     contentDescription = "Ошибка загрузки",
                     tint = colors.error
                 )

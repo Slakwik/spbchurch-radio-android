@@ -94,11 +94,6 @@ fun SPBChurchRadioTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
         content = content
     )
 }
-
-val Material3Colors: Material3ColorScheme
-    @Composable
-    get() = MaterialTheme.colorScheme

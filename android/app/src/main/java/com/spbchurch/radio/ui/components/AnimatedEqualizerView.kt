@@ -3,13 +3,12 @@ package com.spbchurch.radio.ui.components
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.spbchurch.radio.ui.theme.Theme
 import kotlin.random.Random
 
 @Composable
@@ -22,8 +21,7 @@ fun AnimatedEqualizerView(
     minHeight: Dp = 4.dp,
     maxHeight: Dp = 20.dp
 ) {
-    val colors = Theme.neumorphic
-    val accentColor = colors.accent
+    val accentColor = MaterialTheme.colorScheme.primary
 
     val infiniteTransition = rememberInfiniteTransition(label = "equalizer")
 

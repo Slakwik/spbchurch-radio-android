@@ -113,7 +113,7 @@ fun SettingsScreen() {
                     }
                 )
 
-                HorizontalDivider(color = colors.onSurfaceVariant.copy(alpha = 0.2f))
+                Divider(color = colors.onSurfaceVariant.copy(alpha = 0.2f))
 
                 SettingsItem(
                     icon = Icons.Default.Church,
@@ -147,7 +147,7 @@ fun SettingsScreen() {
                     onClick = { showHelpDialog = true }
                 )
 
-                HorizontalDivider(color = colors.onSurfaceVariant.copy(alpha = 0.2f))
+                Divider(color = colors.onSurfaceVariant.copy(alpha = 0.2f))
 
                 SettingsItem(
                     icon = Icons.Default.Info,
