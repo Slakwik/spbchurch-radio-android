@@ -91,9 +91,7 @@ fun FavoritesScreen(
                             onTrackClick()
                         },
                         onFavorite = { viewModel.toggleFavorite(track) },
-                        onDelete = { showDeleteDialog = track },
-                        onDownload = { viewModel.downloadTrack(track) },
-                        onCancelDownload = { viewModel.cancelDownload(track) }
+                        onDelete = { showDeleteDialog = track }
                     )
                 }
             }
@@ -132,9 +130,7 @@ private fun FavoriteTrackRow(
     isCurrentTrack: Boolean,
     onPlay: () -> Unit,
     onFavorite: () -> Unit,
-    onDelete: () -> Unit,
-    onDownload: () -> Unit,
-    onCancelDownload: () -> Unit
+    onDelete: () -> Unit
 ) {
     val colors = Theme.neumorphic
 
