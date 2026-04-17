@@ -1,18 +1,20 @@
 package com.spbchurch.radio.ui.components
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -34,7 +36,7 @@ fun ArtworkView(
     Box(
         modifier = modifier
             .size(size)
-            .clip(RoundedCornerShape(if (size > 100.dp) 16.dp else 8.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(colors.surface),
         contentAlignment = Alignment.Center
     ) {
@@ -53,14 +55,14 @@ fun ArtworkView(
                 Icon(
                     imageVector = Icons.Default.MusicNote,
                     contentDescription = null,
-                    modifier = Modifier.size(size / 3),
+                    modifier = Modifier.size(64.dp),
                     tint = colors.accent
                 )
                 if (showTitle && title.isNotBlank()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = title,
-                        style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodySmall,
                         color = colors.textSecondary,
                         maxLines = 2
                     )
@@ -137,11 +139,7 @@ fun DottedProgressRing(
     val active = activeColor ?: colors.accent
     val inactive = inactiveColor ?: colors.textSecondary.copy(alpha = 0.3f)
 
-    val totalSize = with(androidx.compose.ui.unit.Dp) {
-        (dotSize.toPx() + spacing.toPx()) * dotCount
-    }
-
-    Canvas(modifier = modifier.size(totalSize.dp)) {
+    Canvas(modifier = modifier.size((dotSize.value + spacing.value) * dotCount)) {
         val centerX = size.width / 2
         val centerY = size.height / 2
         val radius = (size.width - dotSize.toPx()) / 2

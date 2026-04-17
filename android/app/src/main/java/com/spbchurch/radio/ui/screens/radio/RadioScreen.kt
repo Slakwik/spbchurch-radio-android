@@ -1,10 +1,9 @@
 package com.spbchurch.radio.ui.screens.radio
 
-import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -13,13 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.spbchurch.radio.ui.components.*
 import com.spbchurch.radio.ui.theme.Theme
 import com.spbchurch.radio.viewmodel.MainViewModel
@@ -74,8 +70,7 @@ fun RadioScreen(
             Text(
                 text = "SPBChurch",
                 style = MaterialTheme.typography.headlineMedium,
-                color = colors.accent,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                color = colors.accent
             )
 
             Text(

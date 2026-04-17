@@ -1,7 +1,5 @@
 package com.spbchurch.radio.ui.screens.favorites
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,7 +18,6 @@ import com.spbchurch.radio.ui.components.*
 import com.spbchurch.radio.ui.theme.Theme
 import com.spbchurch.radio.viewmodel.MainViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
     viewModel: MainViewModel,
@@ -85,48 +82,19 @@ fun FavoritesScreen(
                     val isCurrentTrack = playbackState.currentTrack?.id == track.id
                     val isPlaying = isCurrentTrack && playbackState.isPlaying && !playbackState.isRadioMode
 
-                    SwipeToDismissBox(
-                        state = rememberSwipeToDismissBoxState(
-                            confirmValueChange = { dismissValue ->
-                                if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
-                                    showDeleteDialog = track
-                                }
-                                false
-                            }
-                        ),
-                        backgroundContent = {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(colors.error.copy(alpha = 0.2f))
-                                    .padding(end = 24.dp),
-                                contentAlignment = Alignment.CenterEnd
-                            ) {
-                                Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = "Удалить",
-                                    tint = colors.error
-                                )
-                            }
+                    FavoriteTrackRow(
+                        track = track,
+                        isPlaying = isPlaying,
+                        isCurrentTrack = isCurrentTrack,
+                        onPlay = {
+                            viewModel.playTrack(track, favorites)
+                            onTrackClick()
                         },
-                        enableDismissFromStartToEnd = false
-                    ) {
-                        TrackRow(
-                            track = track,
-                            isPlaying = isPlaying,
-                            isCurrentTrack = isCurrentTrack,
-                            isFavorite = true,
-                            downloadState = viewModel.getDownloadState(track),
-                            downloadProgress = viewModel.getDownloadProgress(track),
-                            onPlay = {
-                                viewModel.playTrack(track, favorites)
-                                onTrackClick()
-                            },
-                            onFavorite = { viewModel.toggleFavorite(track) },
-                            onDownload = { viewModel.downloadTrack(track) },
-                            onCancelDownload = { viewModel.cancelDownload(track) }
-                        )
-                    }
+                        onFavorite = { viewModel.toggleFavorite(track) },
+                        onDelete = { showDeleteDialog = track },
+                        onDownload = { viewModel.downloadTrack(track) },
+                        onCancelDownload = { viewModel.cancelDownload(track) }
+                    )
                 }
             }
         }
@@ -154,5 +122,75 @@ fun FavoritesScreen(
             },
             containerColor = colors.surface
         )
+    }
+}
+
+@Composable
+private fun FavoriteTrackRow(
+    track: Track,
+    isPlaying: Boolean,
+    isCurrentTrack: Boolean,
+    onPlay: () -> Unit,
+    onFavorite: () -> Unit,
+    onDelete: () -> Unit,
+    onDownload: () -> Unit,
+    onCancelDownload: () -> Unit
+) {
+    val colors = Theme.neumorphic
+
+    NeumorphicCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onPlay
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ArtworkView(
+                artworkUrl = null,
+                title = track.title,
+                size = 56.dp
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = track.title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (isCurrentTrack) colors.accent else colors.textPrimary
+                )
+            }
+
+            IconButton(onClick = onFavorite) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Убрать из избранного",
+                    tint = colors.accent
+                )
+            }
+
+            IconButton(onClick = onDelete) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Удалить",
+                    tint = colors.error
+                )
+            }
+
+            NeumorphicIconButton(
+                onClick = onPlay,
+                size = 44.dp
+            ) {
+                Icon(
+                    imageVector = if (isCurrentTrack && isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                    contentDescription = "Воспроизвести",
+                    tint = if (isCurrentTrack) colors.accent else colors.textPrimary,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
     }
 }

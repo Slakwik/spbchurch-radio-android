@@ -2,10 +2,8 @@ package com.spbchurch.radio.ui.components
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -13,10 +11,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.spbchurch.radio.data.model.DownloadState
 import com.spbchurch.radio.data.model.Track
@@ -50,12 +48,6 @@ fun PlayButton(
             Box(
                 modifier = Modifier
                     .size(size * pulseScale)
-                    .shadow(
-                        elevation = 20.dp,
-                        shape = CircleShape,
-                        ambientColor = colors.accent.copy(alpha = 0.5f),
-                        spotColor = colors.accent.copy(alpha = 0.5f)
-                    )
                     .clip(CircleShape)
                     .background(
                         Brush.radialGradient(
@@ -190,7 +182,7 @@ fun DownloadButton(
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(
-                    progress = { progress },
+                    progress = progress,
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp,
                     color = colors.accent,
