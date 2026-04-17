@@ -101,8 +101,8 @@ fun SPBChurchRadioApp(
                                         contentDescription = stringResource(screen.titleRes)
                                     )
                                 },
-                                label = { Text(stringResource(screen.titleRes)) },
                                 selected = selected,
+                                alwaysShowLabel = false,
                                 onClick = {
                                     navController.navigate(screen.route) {
                                         popUpTo(navController.graph.findStartDestination().id) {

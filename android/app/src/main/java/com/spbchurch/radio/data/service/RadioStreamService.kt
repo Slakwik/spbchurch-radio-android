@@ -37,7 +37,7 @@ class RadioStreamService(private val context: Context) {
     companion object {
         const val RADIO_URL = "https://station.spbchurch.ru/radio"
         const val METADATA_URL = "https://station.spbchurch.ru/"
-        private const val METADATA_POLL_INTERVAL = 10000L
+        private const val METADATA_POLL_INTERVAL = 5000L
     }
 
     fun initialize() {
@@ -131,23 +131,27 @@ class RadioStreamService(private val context: Context) {
 
     private fun parseMetadata(html: String): String {
         val patterns = listOf(
-            Regex("Currently playing:\\s*([^<]+)"),
-            Regex(">\\s*([^<]+Названи)</a>"),
-            Regex("stream_title\\s*=\\s*['\"]([^'\"]+)['\"]")
+            Regex("""Currently playing:\s*([^<"'\n]+)"""),
+            Regex("""stream_title['"]?\s*[=:]\s*['"]([^'"]+)['"]"""),
+            Regex("""Названи[её]\s*</[^>]*>\s*<[^>]*>([^<]+)</a>"""),
+            Regex("""<title>[^<]*-\s*([^<]+)</title>"""),
+            Regex("""playing\s*[=:]\s*['"]([^'"]+)['"]""")
         )
 
         for (pattern in patterns) {
             val match = pattern.find(html)
             if (match != null) {
-                return match.groupValues[1]
+                val title = match.groupValues[1]
+                    .replace(Regex("""[|_\-]+"""), " ")
+                    .replace(Regex("""\s+"""), " ")
                     .replace("SPBChurch Radio", "")
                     .replace("Церковь Преображение", "")
-                    .replace("|", "")
-                    .replace("-", "")
                     .trim()
-                    .takeIf { it.isNotBlank() } ?: "Нет данных"
+                if (title.isNotBlank()) {
+                    return title
+                }
             }
         }
-        return "Нет данных"
+        return "Радио"
     }
 }

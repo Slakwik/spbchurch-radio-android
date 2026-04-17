@@ -90,7 +90,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _playbackState.value = _playbackState.value.copy(
                     currentTrack = track,
                     currentTitle = track?.title ?: "",
-                    isRadioMode = track == null && _playbackState.value.isRadioMode
+                    isRadioMode = false
                 )
             }
         }
@@ -189,11 +189,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun playRadio() {
+        _playbackState.value = PlaybackState(isRadioMode = true, currentTitle = "Загрузка...")
         radioStreamService.play()
     }
 
     fun stopRadio() {
         radioStreamService.stop()
+        _playbackState.value = PlaybackState()
     }
 
     fun playTrack(track: Track, queue: List<Track>? = null) {
