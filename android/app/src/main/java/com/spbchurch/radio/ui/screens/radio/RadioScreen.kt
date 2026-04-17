@@ -92,8 +92,8 @@ fun RadioScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             ArtworkView(
-                artworkUrl = null,
-                title = "Древо жизни",
+                artwork = playbackState.artwork,
+                title = playbackState.currentTitle.ifBlank { "Древо жизни" },
                 size = 280.dp
             )
 

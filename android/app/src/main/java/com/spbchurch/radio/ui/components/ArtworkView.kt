@@ -22,7 +22,7 @@ import coil.compose.AsyncImage
 
 @Composable
 fun ArtworkView(
-    artworkUrl: String?,
+    artwork: Any?,
     title: String,
     modifier: Modifier = Modifier,
     size: Dp = 200.dp,
@@ -42,9 +42,9 @@ fun ArtworkView(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            if (artworkUrl != null) {
+            if (artwork != null) {
                 AsyncImage(
-                    model = artworkUrl,
+                    model = artwork,
                     contentDescription = title,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
@@ -77,7 +77,7 @@ fun ArtworkView(
 
 @Composable
 fun ArtworkViewFrosted(
-    artworkUrl: String?,
+    artwork: Any?,
     title: String,
     modifier: Modifier = Modifier,
     size: Dp = 200.dp
@@ -88,9 +88,9 @@ fun ArtworkViewFrosted(
         modifier = modifier.size(size),
         contentAlignment = Alignment.Center
     ) {
-        if (artworkUrl != null) {
+        if (artwork != null) {
             AsyncImage(
-                model = artworkUrl,
+                model = artwork,
                 contentDescription = title,
                 modifier = Modifier
                     .fillMaxSize()
@@ -120,7 +120,7 @@ fun ArtworkViewFrosted(
             )
         ) {
             ArtworkView(
-                artworkUrl = artworkUrl,
+                artwork = artwork,
                 title = title,
                 modifier = Modifier.fillMaxSize(),
                 size = size * 0.85f

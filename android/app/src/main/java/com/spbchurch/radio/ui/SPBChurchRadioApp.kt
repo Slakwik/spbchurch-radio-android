@@ -78,6 +78,7 @@ fun SPBChurchRadioApp(
                             isPlaying = playbackState.isPlaying,
                             isRadioMode = playbackState.isRadioMode,
                             currentTitle = playbackState.currentTitle,
+                            artwork = playbackState.artwork,
                             onPlayPause = { viewModel.togglePlayPause() },
                             onNext = { viewModel.nextTrack() },
                             onExpand = { navController.navigate("player") },

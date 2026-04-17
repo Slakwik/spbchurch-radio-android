@@ -147,7 +147,7 @@ fun NowPlayingScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             ArtworkView(
-                artworkUrl = null,
+                artwork = playbackState.artwork,
                 title = playbackState.currentTrack?.title ?: "",
                 size = 240.dp
             )

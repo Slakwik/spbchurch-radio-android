@@ -35,6 +35,9 @@ class RadioStreamService(private val context: Context) {
     private val _isBuffering = MutableStateFlow(false)
     val isBuffering: StateFlow<Boolean> = _isBuffering.asStateFlow()
 
+    private val _artwork = MutableStateFlow<ByteArray?>(null)
+    val artwork: StateFlow<ByteArray?> = _artwork.asStateFlow()
+
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
@@ -79,6 +82,10 @@ class RadioStreamService(private val context: Context) {
 
                 override fun onIsPlayingChanged(playing: Boolean) {
                     _isPlaying.value = playing
+                }
+
+                override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+                    _artwork.value = mediaMetadata.artworkData
                 }
             })
         }

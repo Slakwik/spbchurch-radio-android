@@ -19,6 +19,7 @@ fun MiniPlayerBar(
     isPlaying: Boolean,
     isRadioMode: Boolean,
     currentTitle: String,
+    artwork: ByteArray?,
     onPlayPause: () -> Unit,
     onNext: () -> Unit,
     onExpand: () -> Unit,
@@ -46,7 +47,7 @@ fun MiniPlayerBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ArtworkView(
-                artworkUrl = null,
+                artwork = artwork,
                 title = "",
                 size = 48.dp
             )

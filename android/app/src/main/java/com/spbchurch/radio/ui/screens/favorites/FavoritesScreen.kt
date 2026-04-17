@@ -142,7 +142,7 @@ private fun FavoriteTrackRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ArtworkView(
-                artworkUrl = null,
+                artwork = null,
                 title = track.title,
                 size = 56.dp
             )

@@ -89,6 +89,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
+
+        viewModelScope.launch {
+            radioStreamService.artwork.collect { bytes ->
+                if (_playbackState.value.isRadioMode) {
+                    _playbackState.value = _playbackState.value.copy(artwork = bytes)
+                }
+            }
+        }
     }
 
     private fun observeFilePlayer() {
@@ -144,6 +152,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             filePlayerService.playbackOrder.collect { order ->
                 _playbackState.value = _playbackState.value.copy(playbackOrder = order)
+            }
+        }
+
+        viewModelScope.launch {
+            filePlayerService.artwork.collect { bytes ->
+                if (!_playbackState.value.isRadioMode) {
+                    _playbackState.value = _playbackState.value.copy(artwork = bytes)
+                }
             }
         }
 
@@ -207,7 +223,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun playRadio() {
         filePlayerService.stop()
-        _playbackState.value = PlaybackState(isRadioMode = true, currentTitle = "Загрузка...")
+        _playbackState.value = PlaybackState(
+            isRadioMode = true,
+            currentTitle = "Загрузка...",
+            artwork = null
+        )
         radioStreamService.play()
     }
 
