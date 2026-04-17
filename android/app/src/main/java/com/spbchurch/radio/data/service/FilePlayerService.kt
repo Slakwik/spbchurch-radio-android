@@ -93,6 +93,7 @@ class FilePlayerService(private val context: Context) {
         }
 
         _currentTrack.value = track
+        _isPlaying.value = true
     }
 
     fun pause() {

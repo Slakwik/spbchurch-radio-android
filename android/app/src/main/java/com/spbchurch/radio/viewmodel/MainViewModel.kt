@@ -87,13 +87,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun observeFilePlayer() {
         viewModelScope.launch {
             filePlayerService.currentTrack.collect { track ->
-                updatePlaybackState(track)
+                _playbackState.value = _playbackState.value.copy(
+                    currentTrack = track,
+                    currentTitle = track?.title ?: "",
+                    isRadioMode = track == null && _playbackState.value.isRadioMode
+                )
             }
         }
 
         viewModelScope.launch {
             filePlayerService.isPlaying.collect { isPlaying ->
-                updatePlaybackState(_playbackState.value.currentTrack)
+                _playbackState.value = _playbackState.value.copy(isPlaying = isPlaying)
             }
         }
 
@@ -105,21 +109,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             filePlayerService.position.collect { position ->
+                val currentDuration = _playbackState.value.duration
                 _playbackState.value = _playbackState.value.copy(
                     position = position,
-                    progress = if (_playbackState.value.duration > 0) 
-                        position.toFloat() / _playbackState.value.duration else 0f
+                    progress = if (currentDuration > 0) 
+                        position.toFloat() / currentDuration else 0f
                 )
             }
         }
 
         viewModelScope.launch {
             filePlayerService.duration.collect { duration ->
-                _playbackState.value = _playbackState.value.copy(
-                    duration = duration,
-                    progress = if (duration > 0) 
-                        _playbackState.value.position.toFloat() / duration else 0f
-                )
+                _playbackState.value = _playbackState.value.copy(duration = duration)
             }
         }
 
@@ -138,15 +139,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         filePlayerService.setOnNextTrack { track ->
             currentQueue = currentQueue.dropWhile { it.url != track.url }
         }
-    }
-
-    private fun updatePlaybackState(track: Track?, isPlaying: Boolean = _playbackState.value.isPlaying) {
-        _playbackState.value = _playbackState.value.copy(
-            currentTrack = track,
-            currentTitle = track?.title ?: "",
-            isPlaying = isPlaying,
-            isRadioMode = false
-        )
     }
 
     fun loadTracks() {
@@ -208,12 +200,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val playbackQueue = queue ?: _filteredTracks.value
         currentQueue = playbackQueue
         filePlayerService.play(track, playbackQueue)
-        _playbackState.value = _playbackState.value.copy(
-            currentTrack = track,
-            currentTitle = track.title,
-            isPlaying = true,
-            isRadioMode = false
-        )
     }
 
     fun togglePlayPause() {
