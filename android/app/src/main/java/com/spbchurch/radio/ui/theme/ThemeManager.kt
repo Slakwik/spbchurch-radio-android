@@ -26,7 +26,8 @@ enum class ThemeMode(
     DARK("dark", "Тёмная", Icons.Filled.DarkMode);
 
     companion object {
-        fun fromKey(key: String?): ThemeMode = entries.firstOrNull { it.key == key } ?: SYSTEM
+        fun fromKey(key: String?): ThemeMode =
+            values().firstOrNull { it.key == key } ?: SYSTEM
     }
 }
 

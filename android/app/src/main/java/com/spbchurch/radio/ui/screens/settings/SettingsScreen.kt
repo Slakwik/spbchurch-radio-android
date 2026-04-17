@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,7 +29,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -86,14 +87,15 @@ fun SettingsScreen() {
 
         SectionHeader("ОФОРМЛЕНИЕ")
         NeumorphicCard {
-            ThemeMode.entries.forEachIndexed { index, mode ->
+            val themes = ThemeMode.entries.toList()
+            themes.forEachIndexed { index, mode ->
                 ThemeRow(
                     mode = mode,
                     selected = currentMode == mode,
                     onClick = { themeManager.setMode(mode) }
                 )
-                if (index != ThemeMode.entries.lastIndex) {
-                    HorizontalDivider(
+                if (index != themes.lastIndex) {
+                    Divider(
                         modifier = Modifier.padding(start = 62.dp),
                         color = colors.onSurfaceVariant.copy(alpha = 0.15f)
                     )
@@ -126,7 +128,7 @@ fun SettingsScreen() {
                     context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://station.spbchurch.ru/")))
                 }
             )
-            HorizontalDivider(
+            Divider(
                 modifier = Modifier.padding(start = 62.dp),
                 color = colors.onSurfaceVariant.copy(alpha = 0.15f)
             )
@@ -147,7 +149,7 @@ fun SettingsScreen() {
         SectionHeader("О ПРИЛОЖЕНИИ")
         NeumorphicCard {
             AboutInfoRow()
-            HorizontalDivider(
+            Divider(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 color = colors.onSurfaceVariant.copy(alpha = 0.15f)
             )
@@ -186,7 +188,7 @@ private fun SectionHeader(title: String) {
 }
 
 @Composable
-private fun NeumorphicCard(content: @Composable Column.() -> Unit) {
+private fun NeumorphicCard(content: @Composable ColumnScope.() -> Unit) {
     val colors = MaterialTheme.colorScheme
     Column(
         modifier = Modifier
