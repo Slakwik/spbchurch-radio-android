@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Tree trunk -->
+    <path
+        android:fillColor="#D4A23A"
+        android:pathData="M52,75 L56,75 L56,88 L52,88 Z"/>
+    <!-- Tree foliage -->
+    <path
+        android:fillColor="#D4A23A"
+        android:pathData="M54,30 L70,55 L60,55 L72,75 L36,75 L48,55 L38,55 Z"/>
+    <!-- Roots -->
+    <path
+        android:fillColor="#D4A23A"
+        android:strokeWidth="2"
+        android:strokeColor="#D4A23A"
+        android:pathData="M54,88 Q45,92 40,90 M54,88 Q63,92 68,90"/>
+</vector>

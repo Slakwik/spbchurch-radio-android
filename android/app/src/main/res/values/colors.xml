@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Neumorphic Light Theme -->
+    <color name="background_light">#FFF0F3F5</color>
+    <color name="surface_light">#FFF2F2F5</color>
+    <color name="shadow_light_light">#FFFFFFFF</color>
+    <color name="shadow_dark_light">#FFA8ABB5</color>
+    <color name="text_primary_light">#FF1F1F24</color>
+    <color name="text_secondary_light">#FF737380</color>
+
+    <!-- Neumorphic Dark Theme -->
+    <color name="background_dark">#FF1C1C24</color>
+    <color name="surface_dark">#FF26262E</color>
+    <color name="shadow_light_dark">#FFFFFFFF</color>
+    <color name="shadow_dark_dark">#FF000000</color>
+    <color name="text_primary_dark">#FFF2F2F5</color>
+    <color name="text_secondary_dark">#FF9999A6</color>
+
+    <!-- Accent Colors -->
+    <color name="accent_light">#FFD4A23A</color>
+    <color name="accent_dark">#FFE8BE5A</color>
+
+    <!-- Status Colors -->
+    <color name="success_light">#FF33C75A</color>
+    <color name="success_dark">#FF4DD973</color>
+    <color name="error_light">#FFE63835</color>
+    <color name="error_dark">#FFF3594C</color>
+
+    <!-- Basic Colors -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+</resources>
