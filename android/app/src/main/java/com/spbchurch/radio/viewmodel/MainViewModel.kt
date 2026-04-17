@@ -255,6 +255,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun stopFile() {
+        filePlayerService.stop()
+        _playbackState.value = PlaybackState()
+    }
+
     fun nextTrack() {
         filePlayerService.nextTrack()
     }

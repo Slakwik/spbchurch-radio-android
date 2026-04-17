@@ -10,6 +10,7 @@ import com.spbchurch.radio.data.repository.TrackRepository
 import com.spbchurch.radio.data.service.RadioStreamService
 import com.spbchurch.radio.data.service.DownloadManager
 import com.spbchurch.radio.data.service.FavoritesManager
+import com.spbchurch.radio.ui.theme.ThemeManager
 
 class RadioApplication : Application() {
 
@@ -25,6 +26,8 @@ class RadioApplication : Application() {
         private set
     lateinit var downloadRepository: DownloadRepository
         private set
+    lateinit var themeManager: ThemeManager
+        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -38,6 +41,7 @@ class RadioApplication : Application() {
         trackRepository = TrackRepository()
         favoritesRepository = FavoritesRepository(favoritesManager)
         downloadRepository = DownloadRepository(downloadManager)
+        themeManager = ThemeManager(this)
     }
 
     private fun createNotificationChannel() {

@@ -1,15 +1,31 @@
 package com.spbchurch.radio.ui
 
-import androidx.compose.animation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.Radio
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -18,7 +34,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.spbchurch.radio.R
 import com.spbchurch.radio.ui.components.MiniPlayerBar
 import com.spbchurch.radio.ui.screens.downloads.DownloadsScreen
 import com.spbchurch.radio.ui.screens.favorites.FavoritesScreen
@@ -28,137 +43,148 @@ import com.spbchurch.radio.ui.screens.settings.SettingsScreen
 import com.spbchurch.radio.ui.screens.tracks.TracksScreen
 import com.spbchurch.radio.viewmodel.MainViewModel
 
-sealed class Screen(
+private sealed class Tab(
     val route: String,
-    val titleRes: Int,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector
+    val title: String,
+    val icon: ImageVector
 ) {
-    data object Radio : Screen("radio", R.string.radio, Icons.Filled.Radio, Icons.Outlined.Radio)
-    data object Tracks : Screen("tracks", R.string.tracks, Icons.Filled.MusicNote, Icons.Outlined.MusicNote)
-    data object Favorites : Screen("favorites", R.string.favorites, Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder)
-    data object Downloads : Screen("downloads", R.string.downloads, Icons.Filled.Download, Icons.Outlined.Download)
-    data object Settings : Screen("settings", R.string.settings, Icons.Filled.Settings, Icons.Outlined.Settings)
+    data object Radio : Tab("radio", "Радио", Icons.Filled.Radio)
+    data object Tracks : Tab("tracks", "Треки", Icons.Filled.LibraryMusic)
+    data object Favorites : Tab("favorites", "Избранное", Icons.Filled.Favorite)
+    data object Downloads : Tab("downloads", "Загрузки", Icons.Filled.Download)
+    data object Settings : Tab("settings", "Настройки", Icons.Filled.Settings)
+
+    companion object {
+        val all = listOf(Radio, Tracks, Favorites, Downloads, Settings)
+    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SPBChurchRadioApp(
-    viewModel: MainViewModel
-) {
+fun SPBChurchRadioApp(viewModel: MainViewModel) {
     val navController = rememberNavController()
-    val screens = listOf(
-        Screen.Radio,
-        Screen.Tracks,
-        Screen.Favorites,
-        Screen.Downloads,
-        Screen.Settings
-    )
-
     val playbackState by viewModel.playbackState.collectAsStateWithLifecycle()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
-    val colors = MaterialTheme.colorScheme
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
 
-    val showBottomBar = currentDestination?.route != "player"
-    val showMiniPlayer = playbackState.currentTrack != null || playbackState.isRadioMode
+    val showBottomBar = currentRoute != "player"
+    // Mini player only when a file is loaded, and never on Radio / Settings / Player itself
+    val showMiniPlayer = playbackState.currentTrack != null &&
+        !playbackState.isRadioMode &&
+        currentRoute != Tab.Radio.route &&
+        currentRoute != Tab.Settings.route &&
+        currentRoute != "player"
 
     Scaffold(
-        containerColor = colors.background,
+        containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0),
         bottomBar = {
             if (showBottomBar) {
                 Column {
                     AnimatedVisibility(
                         visible = showMiniPlayer,
-                        enter = slideInVertically(initialOffsetY = { it }),
-                        exit = slideOutVertically(targetOffsetY = { it })
+                        enter = slideInVertically { it } + fadeIn(),
+                        exit = slideOutVertically { it } + fadeOut()
                     ) {
-                        MiniPlayerBar(
-                            track = playbackState.currentTrack,
-                            isPlaying = playbackState.isPlaying,
-                            isRadioMode = playbackState.isRadioMode,
-                            currentTitle = playbackState.currentTitle,
-                            artwork = playbackState.artwork,
-                            onPlayPause = { viewModel.togglePlayPause() },
-                            onNext = { viewModel.nextTrack() },
-                            onExpand = { navController.navigate("player") },
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
-                    }
-
-                    NavigationBar(
-                        containerColor = colors.surface,
-                        contentColor = colors.onSurface
-                    ) {
-                        screens.forEach { screen ->
-                            val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-                            NavigationBarItem(
-                                icon = {
-                                    Icon(
-                                        imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
-                                        contentDescription = stringResource(screen.titleRes)
-                                    )
-                                },
-                                selected = selected,
-                                onClick = {
-                                    navController.navigate(screen.route) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                },
-                                colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = colors.primary,
-                                    unselectedIconColor = colors.onSurfaceVariant,
-                                    indicatorColor = colors.primaryContainer
-                                )
+                        playbackState.currentTrack?.let { track ->
+                            val progress = if (playbackState.duration > 0)
+                                playbackState.position.toFloat() / playbackState.duration else 0f
+                            MiniPlayerBar(
+                                track = track,
+                                isPlaying = playbackState.isPlaying,
+                                progress = progress,
+                                artwork = playbackState.artwork,
+                                onPlayPause = { viewModel.togglePlayPause() },
+                                onPrevious = { viewModel.previousTrack() },
+                                onNext = { viewModel.nextTrack() },
+                                onClose = { viewModel.stopFile() },
+                                onExpand = { navController.navigate("player") },
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                             )
                         }
                     }
+
+                    BottomTabBar(
+                        currentRoute = currentRoute,
+                        onSelect = { tab ->
+                            navController.navigate(tab.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
                 }
             }
         }
-    ) { paddingValues ->
+    ) { padding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Radio.route,
-            modifier = Modifier.padding(paddingValues)
+            startDestination = Tab.Radio.route,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(padding)
         ) {
-            composable(Screen.Radio.route) {
+            composable(Tab.Radio.route) {
                 RadioScreen(
                     viewModel = viewModel,
-                    onTrackClick = { navController.navigate("player") }
+                    onTrackClick = { navController.navigate("player") },
+                    onFindInLibrary = { query ->
+                        viewModel.setSearchQuery(query)
+                        navController.navigate(Tab.Tracks.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                 )
             }
-            composable(Screen.Tracks.route) {
-                TracksScreen(
-                    viewModel = viewModel,
-                    onTrackClick = { navController.navigate("player") }
-                )
+            composable(Tab.Tracks.route) {
+                TracksScreen(viewModel = viewModel, onTrackClick = { navController.navigate("player") })
             }
-            composable(Screen.Favorites.route) {
-                FavoritesScreen(
-                    viewModel = viewModel,
-                    onTrackClick = { navController.navigate("player") }
-                )
+            composable(Tab.Favorites.route) {
+                FavoritesScreen(viewModel = viewModel, onTrackClick = { navController.navigate("player") })
             }
-            composable(Screen.Downloads.route) {
-                DownloadsScreen(
-                    viewModel = viewModel,
-                    onTrackClick = { navController.navigate("player") }
-                )
+            composable(Tab.Downloads.route) {
+                DownloadsScreen(viewModel = viewModel, onTrackClick = { navController.navigate("player") })
             }
-            composable(Screen.Settings.route) {
+            composable(Tab.Settings.route) {
                 SettingsScreen()
             }
             composable("player") {
-                NowPlayingScreen(
-                    viewModel = viewModel,
-                    onBack = { navController.popBackStack() }
-                )
+                NowPlayingScreen(viewModel = viewModel, onBack = { navController.popBackStack() })
             }
+        }
+    }
+}
+
+@Composable
+private fun BottomTabBar(currentRoute: String?, onSelect: (Tab) -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    NavigationBar(
+        containerColor = colors.background,
+        contentColor = colors.onBackground,
+        tonalElevation = 0.dp
+    ) {
+        Tab.all.forEach { tab ->
+            val selected = currentRoute == tab.route
+            NavigationBarItem(
+                selected = selected,
+                onClick = { onSelect(tab) },
+                icon = { androidx.compose.material3.Icon(tab.icon, tab.title) },
+                label = { androidx.compose.material3.Text(tab.title) },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = colors.primary,
+                    selectedTextColor = colors.primary,
+                    unselectedIconColor = colors.onSurfaceVariant,
+                    unselectedTextColor = colors.onSurfaceVariant,
+                    indicatorColor = colors.background
+                )
+            )
         }
     }
 }

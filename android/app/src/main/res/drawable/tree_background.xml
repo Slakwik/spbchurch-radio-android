@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+
+    <!-- Trunk -->
+    <path
+        android:fillColor="#D4A23A"
+        android:pathData="M116,150 L124,150 L124,196 L116,196 Z" />
+
+    <!-- Foliage — three triangles -->
+    <path
+        android:fillColor="#D4A23A"
+        android:pathData="M120,40 L160,100 L138,100 L172,150 L68,150 L102,100 L80,100 Z" />
+
+    <!-- Roots (right) -->
+    <path
+        android:fillColor="#D4A23A"
+        android:pathData="M124,196 C140,200 156,198 168,210 C156,202 144,206 130,204 Z" />
+
+    <!-- Roots (left) -->
+    <path
+        android:fillColor="#D4A23A"
+        android:pathData="M116,196 C100,200 84,198 72,210 C84,202 96,206 110,204 Z" />
+</vector>
