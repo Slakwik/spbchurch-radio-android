@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Favorite
@@ -175,14 +176,17 @@ private fun BottomTabBar(currentRoute: String?, onSelect: (Tab) -> Unit) {
             NavigationBarItem(
                 selected = selected,
                 onClick = { onSelect(tab) },
-                icon = { androidx.compose.material3.Icon(tab.icon, tab.title) },
-                label = { androidx.compose.material3.Text(tab.title) },
+                icon = {
+                    androidx.compose.material3.Icon(
+                        imageVector = tab.icon,
+                        contentDescription = tab.title,
+                        modifier = Modifier.size(30.dp)
+                    )
+                },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = colors.primary,
-                    selectedTextColor = colors.primary,
                     unselectedIconColor = colors.onSurfaceVariant,
-                    unselectedTextColor = colors.onSurfaceVariant,
-                    indicatorColor = colors.background
+                    indicatorColor = colors.primary.copy(alpha = 0.12f)
                 )
             )
         }

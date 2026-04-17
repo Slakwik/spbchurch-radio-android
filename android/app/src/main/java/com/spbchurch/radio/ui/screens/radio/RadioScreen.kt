@@ -86,7 +86,7 @@ fun RadioScreen(
     ) {
         // Background tree (always present, brightness varies)
         val treeAlpha by animateFloatAsState(
-            targetValue = if (isPlaying) 0.55f else 0.18f,
+            targetValue = if (isPlaying) 0.75f else 0.20f,
             animationSpec = tween(1200),
             label = "tree_alpha"
         )
@@ -96,7 +96,7 @@ fun RadioScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .alpha(treeAlpha),
-            contentScale = ContentScale.Fit
+            contentScale = ContentScale.Crop
         )
 
         // Halo behind play button when playing
