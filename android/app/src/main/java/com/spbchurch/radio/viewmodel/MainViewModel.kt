@@ -140,10 +140,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun updatePlaybackState(track: Track?) {
+    private fun updatePlaybackState(track: Track?, isPlaying: Boolean = _playbackState.value.isPlaying) {
         _playbackState.value = _playbackState.value.copy(
             currentTrack = track,
             currentTitle = track?.title ?: "",
+            isPlaying = isPlaying,
             isRadioMode = false
         )
     }
@@ -207,6 +208,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val playbackQueue = queue ?: _filteredTracks.value
         currentQueue = playbackQueue
         filePlayerService.play(track, playbackQueue)
+        _playbackState.value = _playbackState.value.copy(
+            currentTrack = track,
+            currentTitle = track.title,
+            isPlaying = true,
+            isRadioMode = false
+        )
     }
 
     fun togglePlayPause() {

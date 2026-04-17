@@ -4,7 +4,6 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -15,7 +14,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -26,7 +24,6 @@ import com.spbchurch.radio.ui.components.*
 import com.spbchurch.radio.ui.theme.Theme
 import com.spbchurch.radio.viewmodel.MainViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NowPlayingScreen(
     viewModel: MainViewModel,
@@ -39,7 +36,6 @@ fun NowPlayingScreen(
     var showOrderMenu by remember { mutableStateOf(false) }
 
     val dragOffset = remember { mutableFloatStateOf(0f) }
-    val density = LocalDensity.current
 
     val progress = if (playbackState.isRadioMode) {
         0f
@@ -71,7 +67,7 @@ fun NowPlayingScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
                 .pointerInput(Unit) {
                     detectVerticalDragGestures(
                         onDragEnd = {
@@ -87,95 +83,73 @@ fun NowPlayingScreen(
                 },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Закрыть",
-                        tint = colors.textPrimary,
-                        modifier = Modifier.size(32.dp)
+            TopAppBar(
+                title = {
+                    Text(
+                        text = if (playbackState.isRadioMode) "Радио" else "Музыка",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colors.textPrimary
                     )
-                }
-
-                Text(
-                    text = if (playbackState.isRadioMode) "Радио" else "Музыка",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colors.textPrimary
-                )
-
-                Box {
-                    IconButton(onClick = { showMenu = true }) {
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
                         Icon(
-                            Icons.Default.MoreVert,
-                            contentDescription = "Действия",
-                            tint = colors.textPrimary
+                            Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Закрыть",
+                            tint = colors.textPrimary,
+                            modifier = Modifier.size(28.dp)
                         )
                     }
-
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        playbackState.currentTrack?.let { track ->
-                            val isFavorite = viewModel.isFavorite(track)
-                            DropdownMenuItem(
-                                text = {
-                                    Text(if (isFavorite) "Убрать из избранного" else "В избранное")
-                                },
-                                onClick = {
-                                    viewModel.toggleFavorite(track)
-                                    showMenu = false
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                        null
-                                    )
-                                }
+                },
+                actions = {
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(
+                                Icons.Default.MoreVert,
+                                contentDescription = "Действия",
+                                tint = colors.textPrimary
                             )
+                        }
 
-                            val downloadState = viewModel.getDownloadState(track)
-                            if (downloadState == DownloadState.None) {
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            playbackState.currentTrack?.let { track ->
+                                val isFavorite = viewModel.isFavorite(track)
                                 DropdownMenuItem(
-                                    text = { Text("Скачать") },
+                                    text = {
+                                        Text(if (isFavorite) "Убрать из избранного" else "В избранное")
+                                    },
                                     onClick = {
-                                        viewModel.downloadTrack(track)
+                                        viewModel.toggleFavorite(track)
                                         showMenu = false
                                     },
                                     leadingIcon = {
-                                        Icon(Icons.Default.Download, null)
-                                    }
-                                )
-                            } else if (downloadState == DownloadState.Downloaded) {
-                                DropdownMenuItem(
-                                    text = { Text("Удалить загрузку") },
-                                    onClick = {
-                                        viewModel.deleteDownload(track)
-                                        showMenu = false
-                                    },
-                                    leadingIcon = {
-                                        Icon(Icons.Default.Delete, null)
+                                        Icon(
+                                            if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                            null
+                                        )
                                     }
                                 )
                             }
                         }
                     }
-                }
-            }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = colors.background.copy(alpha = 0f)
+                )
+            )
 
-            Spacer(modifier = Modifier.weight(0.1f))
+            Spacer(modifier = Modifier.height(8.dp))
 
             ArtworkView(
                 artworkUrl = null,
                 title = playbackState.currentTrack?.title ?: "",
-                size = 280.dp
+                size = 240.dp
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             if (playbackState.isRadioMode) {
                 LiveIndicator(
@@ -188,16 +162,19 @@ fun NowPlayingScreen(
                 text = playbackState.currentTitle.ifBlank {
                     playbackState.currentTrack?.title ?: "Выберите трек"
                 },
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleLarge,
                 color = colors.textPrimary,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
             )
 
-            if (!playbackState.isRadioMode && playbackState.duration > 0) {
-                Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
+            if (!playbackState.isRadioMode && playbackState.duration > 0) {
                 Slider(
                     value = progress,
                     onValueChange = { newProgress ->
@@ -208,11 +185,15 @@ fun NowPlayingScreen(
                         activeTrackColor = colors.accent,
                         inactiveTrackColor = colors.textSecondary.copy(alpha = 0.3f)
                     ),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
@@ -228,62 +209,52 @@ fun NowPlayingScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(0.2f))
+            Spacer(modifier = Modifier.weight(1f))
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box {
+                IconButton(
+                    onClick = { showOrderMenu = true },
+                    modifier = Modifier.size(48.dp)
+                ) {
                     val currentOrder = playbackState.playbackOrder
                     val orderIcon = when (currentOrder) {
                         PlaybackOrder.SHUFFLE -> Icons.Default.Shuffle
                         PlaybackOrder.REPEAT -> Icons.Default.Repeat
-                        PlaybackOrder.PLAY_ONCE -> Icons.Default.Repeat
+                        PlaybackOrder.PLAY_ONCE -> Icons.Default.RepeatOnOne
                     }
 
-                    IconButton(onClick = { showOrderMenu = true }) {
-                        Icon(
-                            imageVector = orderIcon,
-                            contentDescription = "Порядок воспроизведения",
-                            tint = if (currentOrder == PlaybackOrder.SHUFFLE)
-                                colors.accent else colors.textSecondary
-                        )
-                    }
+                    Icon(
+                        imageVector = orderIcon,
+                        contentDescription = "Порядок",
+                        tint = if (currentOrder == PlaybackOrder.SHUFFLE)
+                            colors.accent else colors.textSecondary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
 
-                    DropdownMenu(
-                        expanded = showOrderMenu,
-                        onDismissRequest = { showOrderMenu = false }
-                    ) {
+                DropdownMenu(
+                    expanded = showOrderMenu,
+                    onDismissRequest = { showOrderMenu = false }
+                ) {
+                    listOf(
+                        PlaybackOrder.SHUFFLE to "Микс",
+                        PlaybackOrder.REPEAT to "Повтор",
+                        PlaybackOrder.PLAY_ONCE to "До конца"
+                    ).forEach { (order, label) ->
                         DropdownMenuItem(
-                            text = { Text("Микс") },
+                            text = { Text(label) },
                             onClick = {
-                                viewModel.setPlaybackOrder(PlaybackOrder.SHUFFLE)
+                                viewModel.setPlaybackOrder(order)
                                 showOrderMenu = false
                             },
                             leadingIcon = {
-                                Icon(Icons.Default.Shuffle, null)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Повтор") },
-                            onClick = {
-                                viewModel.setPlaybackOrder(PlaybackOrder.REPEAT)
-                                showOrderMenu = false
-                            },
-                            leadingIcon = {
-                                Icon(Icons.Default.Repeat, null)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("До конца") },
-                            onClick = {
-                                viewModel.setPlaybackOrder(PlaybackOrder.PLAY_ONCE)
-                                showOrderMenu = false
-                            },
-                            leadingIcon = {
-                                Icon(Icons.Default.Repeat, null)
+                                Icon(Icons.Default.PlayCircle, null)
                             }
                         )
                     }
@@ -291,53 +262,56 @@ fun NowPlayingScreen(
 
                 NeumorphicIconButton(
                     onClick = { viewModel.previousTrack() },
-                    size = 56.dp
+                    size = 48.dp
                 ) {
                     Icon(
                         imageVector = Icons.Default.SkipPrevious,
                         contentDescription = "Предыдущий",
                         tint = colors.textPrimary,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
                 PlayButton(
                     isPlaying = playbackState.isPlaying,
                     onClick = { viewModel.togglePlayPause() },
-                    size = 96.dp
+                    size = 80.dp
                 )
 
                 NeumorphicIconButton(
                     onClick = { viewModel.nextTrack() },
-                    size = 56.dp
+                    size = 48.dp
                 ) {
                     Icon(
                         imageVector = Icons.Default.SkipNext,
                         contentDescription = "Следующий",
                         tint = colors.textPrimary,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
                 playbackState.currentTrack?.let { track ->
-                    IconButton(onClick = { viewModel.toggleFavorite(track) }) {
+                    IconButton(
+                        onClick = { viewModel.toggleFavorite(track) },
+                        modifier = Modifier.size(48.dp)
+                    ) {
                         Icon(
                             imageVector = if (viewModel.isFavorite(track))
                                 Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Избранное",
                             tint = if (viewModel.isFavorite(track))
-                                colors.accent else colors.textSecondary
+                                colors.accent else colors.textSecondary,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.weight(0.2f))
         }
     }
 }
 
 private fun formatDuration(millis: Long): String {
+    if (millis <= 0) return "0:00"
     val totalSeconds = millis / 1000
     val minutes = totalSeconds / 60
     val seconds = totalSeconds % 60
