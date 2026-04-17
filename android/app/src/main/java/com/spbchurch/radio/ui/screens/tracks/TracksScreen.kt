@@ -16,10 +16,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.spbchurch.radio.R
 import com.spbchurch.radio.data.model.SortOrder
 import com.spbchurch.radio.ui.components.*
-import com.spbchurch.radio.ui.theme.Theme
 import com.spbchurch.radio.viewmodel.MainViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TracksScreen(
     viewModel: MainViewModel,
@@ -33,7 +31,7 @@ fun TracksScreen(
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
     val favorites by viewModel.favorites.collectAsStateWithLifecycle()
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
     var showSortMenu by remember { mutableStateOf(false) }
 
@@ -55,14 +53,14 @@ fun TracksScreen(
                 placeholder = {
                     Text(
                         stringResource(R.string.search),
-                        color = colors.textSecondary
+                        color = colors.onSurfaceVariant
                     )
                 },
                 leadingIcon = {
                     Icon(
                         Icons.Default.Search,
                         contentDescription = null,
-                        tint = colors.textSecondary
+                        tint = colors.onSurfaceVariant
                     )
                 },
                 trailingIcon = {
@@ -71,17 +69,15 @@ fun TracksScreen(
                             Icon(
                                 Icons.Default.Clear,
                                 contentDescription = "Очистить",
-                                tint = colors.textSecondary
+                                tint = colors.onSurfaceVariant
                             )
                         }
                     }
                 },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colors.accent,
-                    unfocusedBorderColor = colors.textSecondary.copy(alpha = 0.3f),
-                    focusedContainerColor = colors.surface,
-                    unfocusedContainerColor = colors.surface
+                    focusedBorderColor = colors.primary,
+                    unfocusedBorderColor = colors.outline
                 ),
                 shape = MaterialTheme.shapes.medium
             )
@@ -95,7 +91,7 @@ fun TracksScreen(
                     Icon(
                         Icons.AutoMirrored.Filled.Sort,
                         contentDescription = "Сортировка",
-                        tint = colors.textSecondary
+                        tint = colors.onSurfaceVariant
                     )
                 }
 
@@ -103,42 +99,24 @@ fun TracksScreen(
                     expanded = showSortMenu,
                     onDismissRequest = { showSortMenu = false }
                 ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.sort_default)) },
-                        onClick = {
-                            viewModel.setSortOrder(SortOrder.DEFAULT)
-                            showSortMenu = false
-                        },
-                        leadingIcon = {
-                            if (sortOrder == SortOrder.DEFAULT) {
-                                Icon(Icons.Default.Check, null, tint = colors.accent)
+                    listOf(
+                        SortOrder.DEFAULT to stringResource(R.string.sort_default),
+                        SortOrder.A_TO_Z to stringResource(R.string.sort_az),
+                        SortOrder.Z_TO_A to stringResource(R.string.sort_za)
+                    ).forEach { (order, label) ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                viewModel.setSortOrder(order)
+                                showSortMenu = false
+                            },
+                            leadingIcon = {
+                                if (sortOrder == order) {
+                                    Icon(Icons.Default.Check, null, tint = colors.primary)
+                                }
                             }
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.sort_az)) },
-                        onClick = {
-                            viewModel.setSortOrder(SortOrder.A_TO_Z)
-                            showSortMenu = false
-                        },
-                        leadingIcon = {
-                            if (sortOrder == SortOrder.A_TO_Z) {
-                                Icon(Icons.Default.Check, null, tint = colors.accent)
-                            }
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.sort_za)) },
-                        onClick = {
-                            viewModel.setSortOrder(SortOrder.Z_TO_A)
-                            showSortMenu = false
-                        },
-                        leadingIcon = {
-                            if (sortOrder == SortOrder.Z_TO_A) {
-                                Icon(Icons.Default.Check, null, tint = colors.accent)
-                            }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
@@ -147,7 +125,7 @@ fun TracksScreen(
             Text(
                 text = "${tracks.size} треков",
                 style = MaterialTheme.typography.labelMedium,
-                color = colors.textSecondary,
+                color = colors.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
         }
@@ -158,7 +136,7 @@ fun TracksScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = colors.accent)
+                    CircularProgressIndicator(color = colors.primary)
                 }
             }
             error != null && tracks.isEmpty() -> {
@@ -183,7 +161,7 @@ fun TracksScreen(
                             Icons.Default.MusicOff,
                             contentDescription = null,
                             modifier = Modifier.size(64.dp),
-                            tint = colors.textSecondary
+                            tint = colors.onSurfaceVariant
                         )
                     },
                     title = stringResource(R.string.no_tracks),

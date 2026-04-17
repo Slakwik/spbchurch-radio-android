@@ -8,23 +8,19 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.spbchurch.radio.ui.components.*
-import com.spbchurch.radio.ui.theme.Theme
 import com.spbchurch.radio.viewmodel.MainViewModel
 
 @Composable
@@ -33,10 +29,10 @@ fun RadioScreen(
     onTrackClick: () -> Unit
 ) {
     val playbackState by viewModel.playbackState.collectAsStateWithLifecycle()
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
     val backgroundAlpha by animateFloatAsState(
-        targetValue = if (playbackState.isPlaying) 0.75f else 0.3f,
+        targetValue = if (playbackState.isPlaying) 0.5f else 0.2f,
         animationSpec = tween(1000),
         label = "bg_alpha"
     )
@@ -50,7 +46,6 @@ fun RadioScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .alpha(backgroundAlpha)
-                .blur(10.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -58,7 +53,7 @@ fun RadioScreen(
                     .background(
                         Brush.radialGradient(
                             colors = listOf(
-                                colors.accent.copy(alpha = 0.3f),
+                                colors.primary.copy(alpha = 0.3f),
                                 colors.background
                             )
                         )
@@ -77,16 +72,16 @@ fun RadioScreen(
             Text(
                 text = "SPBChurch",
                 style = MaterialTheme.typography.headlineMedium,
-                color = colors.accent
+                color = colors.primary
             )
 
             Text(
                 text = "Radio",
                 style = MaterialTheme.typography.headlineSmall,
-                color = colors.textSecondary
+                color = colors.onSurfaceVariant
             )
 
-            Spacer(modifier = Modifier.weight(0.3f))
+            Spacer(modifier = Modifier.weight(0.2f))
 
             LiveIndicator(
                 isLive = playbackState.isPlaying,
@@ -114,48 +109,26 @@ fun RadioScreen(
                     Text(
                         text = if (playbackState.isPlaying) playbackState.currentTitle else "Нет данных",
                         style = MaterialTheme.typography.titleMedium,
-                        color = colors.textPrimary,
-                        textAlign = TextAlign.Center,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .padding(horizontal = 32.dp)
-                            .clickable(enabled = playbackState.currentTrack != null) {
-                                onTrackClick()
-                            }
+                        color = colors.onSurface,
+                        modifier = Modifier.padding(horizontal = 32.dp)
                     )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    if (playbackState.currentTrack != null) {
-                        TextButton(onClick = onTrackClick) {
-                            Icon(
-                                imageVector = Icons.Default.LibraryMusic,
-                                contentDescription = null,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Найти в библиотеке")
-                        }
-                    }
                 }
             }
 
-            Spacer(modifier = Modifier.weight(0.3f))
+            Spacer(modifier = Modifier.weight(0.2f))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                NeumorphicIconButton(
+                FilledTonalIconButton(
                     onClick = { viewModel.previousTrack() },
-                    size = 56.dp
+                    modifier = Modifier.size(56.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.SkipPrevious,
                         contentDescription = "Предыдущий",
-                        tint = colors.textPrimary,
                         modifier = Modifier.size(28.dp)
                     )
                 }
@@ -166,14 +139,13 @@ fun RadioScreen(
                     size = 120.dp
                 )
 
-                NeumorphicIconButton(
+                FilledTonalIconButton(
                     onClick = { viewModel.nextTrack() },
-                    size = 56.dp
+                    modifier = Modifier.size(56.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.SkipNext,
                         contentDescription = "Следующий",
-                        tint = colors.textPrimary,
                         modifier = Modifier.size(28.dp)
                     )
                 }

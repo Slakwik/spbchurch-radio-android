@@ -20,8 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.spbchurch.radio.data.model.DownloadState
 import com.spbchurch.radio.data.model.PlaybackOrder
-import com.spbchurch.radio.ui.components.*
-import com.spbchurch.radio.ui.theme.Theme
+import com.spbchurch.radio.ui.components.ArtworkView
+import com.spbchurch.radio.ui.components.MaterialIconButton
+import com.spbchurch.radio.ui.components.PlayButtonM3
+import com.spbchurch.radio.ui.components.LiveIndicatorM3
 import com.spbchurch.radio.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,7 +33,7 @@ fun NowPlayingScreen(
     onBack: () -> Unit
 ) {
     val playbackState by viewModel.playbackState.collectAsStateWithLifecycle()
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
     var showMenu by remember { mutableStateOf(false) }
     var showOrderMenu by remember { mutableStateOf(false) }
@@ -47,7 +49,7 @@ fun NowPlayingScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background)
+            .background(colors.surface)
     ) {
         Box(
             modifier = Modifier
@@ -57,9 +59,9 @@ fun NowPlayingScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            colors.accent.copy(alpha = 0.2f),
-                            colors.background,
-                            colors.background
+                            colors.primary.copy(alpha = 0.2f),
+                            colors.surface,
+                            colors.surface
                         )
                     )
                 )
@@ -89,7 +91,7 @@ fun NowPlayingScreen(
                     Text(
                         text = if (playbackState.isRadioMode) "Радио" else "Музыка",
                         style = MaterialTheme.typography.titleMedium,
-                        color = colors.textPrimary
+                        color = colors.onSurface
                     )
                 },
                 navigationIcon = {
@@ -97,7 +99,7 @@ fun NowPlayingScreen(
                         Icon(
                             Icons.Default.KeyboardArrowDown,
                             contentDescription = "Закрыть",
-                            tint = colors.textPrimary,
+                            tint = colors.onSurface,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -108,7 +110,7 @@ fun NowPlayingScreen(
                             Icon(
                                 Icons.Default.MoreVert,
                                 contentDescription = "Действия",
-                                tint = colors.textPrimary
+                                tint = colors.onSurface
                             )
                         }
 
@@ -138,7 +140,7 @@ fun NowPlayingScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.background.copy(alpha = 0f)
+                    containerColor = colors.surface.copy(alpha = 0f)
                 )
             )
 
@@ -153,7 +155,7 @@ fun NowPlayingScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             if (playbackState.isRadioMode) {
-                LiveIndicator(
+                LiveIndicatorM3(
                     isLive = playbackState.isPlaying,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -164,7 +166,7 @@ fun NowPlayingScreen(
                     playbackState.currentTrack?.title ?: "Выберите трек"
                 },
                 style = MaterialTheme.typography.titleLarge,
-                color = colors.textPrimary,
+                color = colors.onSurface,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -182,9 +184,9 @@ fun NowPlayingScreen(
                         viewModel.seekTo((newProgress * playbackState.duration).toLong())
                     },
                     colors = SliderDefaults.colors(
-                        thumbColor = colors.accent,
-                        activeTrackColor = colors.accent,
-                        inactiveTrackColor = colors.textSecondary.copy(alpha = 0.3f)
+                        thumbColor = colors.primary,
+                        activeTrackColor = colors.primary,
+                        inactiveTrackColor = colors.onSurfaceVariant.copy(alpha = 0.3f)
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -200,12 +202,12 @@ fun NowPlayingScreen(
                     Text(
                         text = formatDuration(playbackState.position),
                         style = MaterialTheme.typography.labelSmall,
-                        color = colors.textSecondary
+                        color = colors.onSurfaceVariant
                     )
                     Text(
                         text = formatDuration(playbackState.duration),
                         style = MaterialTheme.typography.labelSmall,
-                        color = colors.textSecondary
+                        color = colors.onSurfaceVariant
                     )
                 }
             }
@@ -234,7 +236,7 @@ fun NowPlayingScreen(
                         imageVector = orderIcon,
                         contentDescription = "Порядок",
                         tint = if (currentOrder == PlaybackOrder.SHUFFLE)
-                            colors.accent else colors.textSecondary,
+                            colors.primary else colors.onSurfaceVariant,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -261,32 +263,34 @@ fun NowPlayingScreen(
                     }
                 }
 
-                NeumorphicIconButton(
+                MaterialIconButton(
                     onClick = { viewModel.previousTrack() },
-                    size = 48.dp
+                    size = 48.dp,
+                    containerColor = colors.surfaceVariant
                 ) {
                     Icon(
                         imageVector = Icons.Default.SkipPrevious,
                         contentDescription = "Предыдущий",
-                        tint = colors.textPrimary,
+                        tint = colors.onSurfaceVariant,
                         modifier = Modifier.size(24.dp)
                     )
                 }
 
-                PlayButton(
+                PlayButtonM3(
                     isPlaying = playbackState.isPlaying,
                     onClick = { viewModel.togglePlayPause() },
                     size = 80.dp
                 )
 
-                NeumorphicIconButton(
+                MaterialIconButton(
                     onClick = { viewModel.nextTrack() },
-                    size = 48.dp
+                    size = 48.dp,
+                    containerColor = colors.surfaceVariant
                 ) {
                     Icon(
                         imageVector = Icons.Default.SkipNext,
                         contentDescription = "Следующий",
-                        tint = colors.textPrimary,
+                        tint = colors.onSurfaceVariant,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -301,7 +305,7 @@ fun NowPlayingScreen(
                                 Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = "Избранное",
                             tint = if (viewModel.isFavorite(track))
-                                colors.accent else colors.textSecondary,
+                                colors.primary else colors.onSurfaceVariant,
                             modifier = Modifier.size(24.dp)
                         )
                     }

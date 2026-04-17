@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +19,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.spbchurch.radio.ui.theme.Theme
 
 @Composable
 fun ArtworkView(
@@ -31,41 +28,47 @@ fun ArtworkView(
     size: Dp = 200.dp,
     showTitle: Boolean = false
 ) {
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
-    Box(
-        modifier = modifier
-            .size(size)
-            .clip(RoundedCornerShape(16.dp))
-            .background(colors.surface),
-        contentAlignment = Alignment.Center
+    Card(
+        modifier = modifier.size(size),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.surfaceVariant
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        if (artworkUrl != null) {
-            AsyncImage(
-                model = artworkUrl,
-                contentDescription = title,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.MusicNote,
-                    contentDescription = null,
-                    modifier = Modifier.size(64.dp),
-                    tint = colors.accent
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            if (artworkUrl != null) {
+                AsyncImage(
+                    model = artworkUrl,
+                    contentDescription = title,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
-                if (showTitle && title.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.textSecondary,
-                        maxLines = 2
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MusicNote,
+                        contentDescription = null,
+                        modifier = Modifier.size(size / 3),
+                        tint = colors.primary
                     )
+                    if (showTitle && title.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.onSurfaceVariant,
+                            maxLines = 2
+                        )
+                    }
                 }
             }
         }
@@ -79,7 +82,7 @@ fun ArtworkViewFrosted(
     modifier: Modifier = Modifier,
     size: Dp = 200.dp
 ) {
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
     Box(
         modifier = modifier.size(size),
@@ -101,7 +104,7 @@ fun ArtworkViewFrosted(
                     .background(
                         Brush.radialGradient(
                             colors = listOf(
-                                colors.accent.copy(alpha = 0.3f),
+                                colors.primary.copy(alpha = 0.2f),
                                 colors.background
                             )
                         )
@@ -109,11 +112,12 @@ fun ArtworkViewFrosted(
             )
         }
 
-        Box(
-            modifier = Modifier
-                .size(size * 0.85f)
-                .clip(RoundedCornerShape(12.dp))
-                .background(colors.surface)
+        Card(
+            modifier = Modifier.size(size * 0.85f),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = colors.surface
+            )
         ) {
             ArtworkView(
                 artworkUrl = artworkUrl,
@@ -135,9 +139,9 @@ fun DottedProgressRing(
     activeColor: Color? = null,
     inactiveColor: Color? = null
 ) {
-    val colors = Theme.neumorphic
-    val active = activeColor ?: colors.accent
-    val inactive = inactiveColor ?: colors.textSecondary.copy(alpha = 0.3f)
+    val colors = MaterialTheme.colorScheme
+    val active = activeColor ?: colors.primary
+    val inactive = inactiveColor ?: colors.outline.copy(alpha = 0.3f)
 
     val canvasSize = (dotSize.value + spacing.value) * dotCount
     Canvas(modifier = modifier.size(canvasSize.dp)) {

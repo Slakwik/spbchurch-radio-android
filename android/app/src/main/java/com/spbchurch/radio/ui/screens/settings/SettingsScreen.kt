@@ -17,13 +17,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.spbchurch.radio.R
-import com.spbchurch.radio.ui.components.NeumorphicCard
-import com.spbchurch.radio.ui.theme.Theme
+import com.spbchurch.radio.ui.components.MaterialCard
 
 @Composable
 fun SettingsScreen() {
     val context = LocalContext.current
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
     var showThemeDialog by remember { mutableStateOf(false) }
     var selectedTheme by remember { mutableStateOf("Системная") }
@@ -39,18 +38,18 @@ fun SettingsScreen() {
         Text(
             text = stringResource(R.string.settings),
             style = MaterialTheme.typography.headlineMedium,
-            color = colors.textPrimary,
+            color = colors.onSurface,
             modifier = Modifier.padding(vertical = 16.dp)
         )
 
-        NeumorphicCard(
+        MaterialCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column {
                 Text(
                     text = "Внешний вид",
                     style = MaterialTheme.typography.titleMedium,
-                    color = colors.textPrimary,
+                    color = colors.onSurface,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
 
@@ -66,25 +65,25 @@ fun SettingsScreen() {
                         Icon(
                             Icons.Default.Palette,
                             contentDescription = null,
-                            tint = colors.accent
+                            tint = colors.primary
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             text = stringResource(R.string.theme),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = colors.textPrimary
+                            color = colors.onSurface
                         )
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = selectedTheme,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = colors.textSecondary
+                            color = colors.onSurfaceVariant
                         )
                         Icon(
                             Icons.Default.ChevronRight,
                             contentDescription = null,
-                            tint = colors.textSecondary
+                            tint = colors.onSurfaceVariant
                         )
                     }
                 }
@@ -93,14 +92,14 @@ fun SettingsScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        NeumorphicCard(
+        MaterialCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column {
                 Text(
                     text = "Ресурсы",
                     style = MaterialTheme.typography.titleMedium,
-                    color = colors.textPrimary,
+                    color = colors.onSurface,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
 
@@ -114,7 +113,7 @@ fun SettingsScreen() {
                     }
                 )
 
-                Divider(color = colors.textSecondary.copy(alpha = 0.2f))
+                HorizontalDivider(color = colors.onSurfaceVariant.copy(alpha = 0.2f))
 
                 SettingsItem(
                     icon = Icons.Default.Church,
@@ -130,14 +129,14 @@ fun SettingsScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        NeumorphicCard(
+        MaterialCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column {
                 Text(
                     text = "Информация",
                     style = MaterialTheme.typography.titleMedium,
-                    color = colors.textPrimary,
+                    color = colors.onSurface,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
 
@@ -148,7 +147,7 @@ fun SettingsScreen() {
                     onClick = { showHelpDialog = true }
                 )
 
-                Divider(color = colors.textSecondary.copy(alpha = 0.2f))
+                HorizontalDivider(color = colors.onSurfaceVariant.copy(alpha = 0.2f))
 
                 SettingsItem(
                     icon = Icons.Default.Info,
@@ -164,7 +163,7 @@ fun SettingsScreen() {
         Text(
             text = "SPBChurch Radio v1.0.0",
             style = MaterialTheme.typography.labelMedium,
-            color = colors.textSecondary,
+            color = colors.onSurfaceVariant,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
     }
@@ -264,17 +263,17 @@ fun SettingsScreen() {
 
 @Composable
 private fun HelpSection(title: String, content: String) {
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleSmall,
-            color = colors.accent
+            color = colors.primary
         )
         Text(
             text = content,
             style = MaterialTheme.typography.bodySmall,
-            color = colors.textSecondary
+            color = colors.onSurfaceVariant
         )
     }
 }
@@ -286,7 +285,7 @@ private fun SettingsItem(
     subtitle: String,
     onClick: () -> Unit
 ) {
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
     Row(
         modifier = Modifier
@@ -303,26 +302,26 @@ private fun SettingsItem(
             Icon(
                 icon,
                 contentDescription = null,
-                tint = colors.accent
+                tint = colors.primary
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = colors.textPrimary
+                    color = colors.onSurface
                 )
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = colors.textSecondary
+                    color = colors.onSurfaceVariant
                 )
             }
         }
         Icon(
             Icons.Default.ChevronRight,
             contentDescription = null,
-            tint = colors.textSecondary
+            tint = colors.onSurfaceVariant
         )
     }
 }

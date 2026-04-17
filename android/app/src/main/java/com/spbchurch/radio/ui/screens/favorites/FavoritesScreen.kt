@@ -15,7 +15,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.spbchurch.radio.R
 import com.spbchurch.radio.data.model.Track
 import com.spbchurch.radio.ui.components.*
-import com.spbchurch.radio.ui.theme.Theme
 import com.spbchurch.radio.viewmodel.MainViewModel
 
 @Composable
@@ -25,7 +24,7 @@ fun FavoritesScreen(
 ) {
     val favorites by viewModel.favorites.collectAsStateWithLifecycle()
     val playbackState by viewModel.playbackState.collectAsStateWithLifecycle()
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
     var showDeleteDialog by remember { mutableStateOf<Track?>(null) }
 
@@ -44,14 +43,14 @@ fun FavoritesScreen(
             Text(
                 text = stringResource(R.string.favorites),
                 style = MaterialTheme.typography.headlineMedium,
-                color = colors.textPrimary
+                color = colors.onSurface
             )
 
             if (favorites.isNotEmpty()) {
                 Text(
                     text = "${favorites.size} треков",
                     style = MaterialTheme.typography.labelMedium,
-                    color = colors.textSecondary
+                    color = colors.onSurfaceVariant
                 )
             }
         }
@@ -63,7 +62,7 @@ fun FavoritesScreen(
                         Icons.Default.FavoriteBorder,
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
-                        tint = colors.textSecondary
+                        tint = colors.onSurfaceVariant
                     )
                 },
                 title = stringResource(R.string.no_favorites),
@@ -132,9 +131,9 @@ private fun FavoriteTrackRow(
     onFavorite: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
-    NeumorphicCard(
+    MaterialCard(
         modifier = Modifier.fillMaxWidth(),
         onClick = onPlay
     ) {
@@ -156,7 +155,7 @@ private fun FavoriteTrackRow(
                 Text(
                     text = track.title,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (isCurrentTrack) colors.accent else colors.textPrimary
+                    color = if (isCurrentTrack) colors.primary else colors.onSurface
                 )
             }
 
@@ -164,7 +163,7 @@ private fun FavoriteTrackRow(
                 Icon(
                     imageVector = Icons.Default.Favorite,
                     contentDescription = "Убрать из избранного",
-                    tint = colors.accent
+                    tint = colors.primary
                 )
             }
 
@@ -176,14 +175,11 @@ private fun FavoriteTrackRow(
                 )
             }
 
-            NeumorphicIconButton(
-                onClick = onPlay,
-                size = 44.dp
-            ) {
+            IconButton(onClick = onPlay) {
                 Icon(
                     imageVector = if (isCurrentTrack && isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = "Воспроизвести",
-                    tint = if (isCurrentTrack) colors.accent else colors.textPrimary,
+                    tint = if (isCurrentTrack) colors.primary else colors.onSurfaceVariant,
                     modifier = Modifier.size(24.dp)
                 )
             }

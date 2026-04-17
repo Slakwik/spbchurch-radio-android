@@ -9,11 +9,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.spbchurch.radio.data.model.Track
-import com.spbchurch.radio.ui.theme.Theme
 
 @Composable
 fun MiniPlayerBar(
@@ -26,19 +24,25 @@ fun MiniPlayerBar(
     onExpand: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
     if (track == null && !isRadioMode) return
 
-    NeumorphicCard(
+    Card(
         modifier = modifier
             .fillMaxWidth()
             .height(72.dp)
             .clickable(onClick = onExpand),
-        onClick = onExpand
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.surfaceVariant
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             ArtworkView(
@@ -55,14 +59,14 @@ fun MiniPlayerBar(
                 Text(
                     text = if (isRadioMode) "Радио" else track?.title ?: "",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = colors.textPrimary,
+                    color = colors.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = if (isRadioMode) currentTitle else "Воспроизведение",
                     style = MaterialTheme.typography.bodySmall,
-                    color = colors.textSecondary,
+                    color = colors.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -80,7 +84,7 @@ fun MiniPlayerBar(
                     Icon(
                         imageVector = Icons.Default.SkipNext,
                         contentDescription = "Следующий",
-                        tint = colors.textPrimary
+                        tint = colors.onSurfaceVariant
                     )
                 }
             }
@@ -89,7 +93,7 @@ fun MiniPlayerBar(
                 Icon(
                     imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = if (isPlaying) "Пауза" else "Воспроизвести",
-                    tint = colors.accent
+                    tint = colors.primary
                 )
             }
         }

@@ -1,7 +1,6 @@
 package com.spbchurch.radio.ui
 
 import androidx.compose.animation.*
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -27,7 +26,6 @@ import com.spbchurch.radio.ui.screens.player.NowPlayingScreen
 import com.spbchurch.radio.ui.screens.radio.RadioScreen
 import com.spbchurch.radio.ui.screens.settings.SettingsScreen
 import com.spbchurch.radio.ui.screens.tracks.TracksScreen
-import com.spbchurch.radio.ui.theme.Theme
 import com.spbchurch.radio.viewmodel.MainViewModel
 
 sealed class Screen(
@@ -60,7 +58,7 @@ fun SPBChurchRadioApp(
     val playbackState by viewModel.playbackState.collectAsStateWithLifecycle()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
     val showBottomBar = currentDestination?.route != "player"
     val showMiniPlayer = playbackState.currentTrack != null || playbackState.isRadioMode
@@ -88,9 +86,8 @@ fun SPBChurchRadioApp(
                     }
 
                     NavigationBar(
-                        containerColor = colors.background,
-                        contentColor = colors.textPrimary,
-                        tonalElevation = 0.dp
+                        containerColor = colors.surface,
+                        contentColor = colors.onSurface
                     ) {
                         screens.forEach { screen ->
                             val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
@@ -102,7 +99,6 @@ fun SPBChurchRadioApp(
                                     )
                                 },
                                 selected = selected,
-                                alwaysShowLabel = false,
                                 onClick = {
                                     navController.navigate(screen.route) {
                                         popUpTo(navController.graph.findStartDestination().id) {
@@ -113,11 +109,9 @@ fun SPBChurchRadioApp(
                                     }
                                 },
                                 colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = colors.accent,
-                                    selectedTextColor = colors.accent,
-                                    unselectedIconColor = colors.textSecondary,
-                                    unselectedTextColor = colors.textSecondary,
-                                    indicatorColor = colors.surface
+                                    selectedIconColor = colors.primary,
+                                    unselectedIconColor = colors.onSurfaceVariant,
+                                    indicatorColor = colors.primaryContainer
                                 )
                             )
                         }

@@ -14,8 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.spbchurch.radio.R
 import com.spbchurch.radio.data.model.Track
-import com.spbchurch.radio.ui.components.*
-import com.spbchurch.radio.ui.theme.Theme
+import com.spbchurch.radio.ui.components.ArtworkView
+import com.spbchurch.radio.ui.components.MaterialCard
+import com.spbchurch.radio.ui.components.MaterialIconButton
 import com.spbchurch.radio.viewmodel.MainViewModel
 
 @Composable
@@ -25,7 +26,7 @@ fun DownloadsScreen(
 ) {
     val downloadedTracks = remember { mutableStateOf<List<Track>>(emptyList()) }
     val playbackState by viewModel.playbackState.collectAsStateWithLifecycle()
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
     var showDeleteDialog by remember { mutableStateOf<Track?>(null) }
 
@@ -48,14 +49,14 @@ fun DownloadsScreen(
             Text(
                 text = stringResource(R.string.downloads),
                 style = MaterialTheme.typography.headlineMedium,
-                color = colors.textPrimary
+                color = colors.onSurface
             )
 
             if (downloadedTracks.value.isNotEmpty()) {
                 Text(
                     text = "${downloadedTracks.value.size} треков",
                     style = MaterialTheme.typography.labelMedium,
-                    color = colors.textSecondary
+                    color = colors.onSurfaceVariant
                 )
             }
         }
@@ -67,7 +68,7 @@ fun DownloadsScreen(
                         Icons.Default.CloudDownload,
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
-                        tint = colors.textSecondary
+                        tint = colors.onSurfaceVariant
                     )
                 },
                 title = stringResource(R.string.no_downloads),
@@ -123,8 +124,7 @@ fun DownloadsScreen(
                 TextButton(onClick = { showDeleteDialog = null }) {
                     Text("Отмена")
                 }
-            },
-            containerColor = colors.surface
+            }
         )
     }
 }
@@ -139,9 +139,9 @@ private fun DownloadedTrackRow(
     onFavorite: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val colors = Theme.neumorphic
+    val colors = MaterialTheme.colorScheme
 
-    NeumorphicCard(
+    MaterialCard(
         modifier = Modifier.fillMaxWidth(),
         onClick = onPlay
     ) {
@@ -163,20 +163,20 @@ private fun DownloadedTrackRow(
                 Text(
                     text = track.title,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (isCurrentTrack) colors.accent else colors.textPrimary
+                    color = if (isCurrentTrack) colors.primary else colors.onSurface
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         Icons.Default.CheckCircle,
                         contentDescription = null,
                         modifier = Modifier.size(12.dp),
-                        tint = colors.success
+                        tint = colors.tertiary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "Загружено",
                         style = MaterialTheme.typography.labelSmall,
-                        color = colors.textSecondary
+                        color = colors.onSurfaceVariant
                     )
                 }
             }
@@ -185,7 +185,7 @@ private fun DownloadedTrackRow(
                 Icon(
                     imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = if (isFavorite) "Убрать из избранного" else "В избранное",
-                    tint = if (isFavorite) colors.accent else colors.textSecondary
+                    tint = if (isFavorite) colors.primary else colors.onSurfaceVariant
                 )
             }
 
@@ -197,14 +197,15 @@ private fun DownloadedTrackRow(
                 )
             }
 
-            NeumorphicIconButton(
+            MaterialIconButton(
                 onClick = onPlay,
-                size = 44.dp
+                size = 44.dp,
+                containerColor = colors.primaryContainer
             ) {
                 Icon(
                     imageVector = if (isCurrentTrack && isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = "Воспроизвести",
-                    tint = if (isCurrentTrack) colors.accent else colors.textPrimary,
+                    tint = if (isCurrentTrack) colors.onPrimaryContainer else colors.onSurfaceVariant,
                     modifier = Modifier.size(24.dp)
                 )
             }
