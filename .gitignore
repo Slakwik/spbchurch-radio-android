@@ -54,3 +54,6 @@ vcs.xml
 
 # iOS/Swift related (ignore in Android repo)
 spbchurch-radio/
+
+# Local dev helper — lives on the server only
+_start.sh
