@@ -1,0 +1,68 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Cache Android SDK
+        uses: actions/cache@v4
+        with:
+          path: ~/android-sdk
+          key: ${{ runner.os }}-android-sdk-${{ hashFiles('**/build.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-android-sdk-
+
+      - name: Accept Android licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
+
+      - name: Build debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/*.apk
+          retention-days: 30
+
+      - name: Build release APK
+        if: github.ref == 'refs/heads/master'
+        run: |
+          cd android
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Upload release APK
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: android/app/build/outputs/apk/release/*.apk
+          retention-days: 30
