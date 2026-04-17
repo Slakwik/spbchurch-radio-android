@@ -10,6 +10,12 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.concurrent.TimeUnit
@@ -29,15 +35,27 @@ class RadioStreamService(private val context: Context) {
     private val _isBuffering = MutableStateFlow(false)
     val isBuffering: StateFlow<Boolean> = _isBuffering.asStateFlow()
 
+    private val _artwork = MutableStateFlow<ByteArray?>(null)
+    val artwork: StateFlow<ByteArray?> = _artwork.asStateFlow()
+
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
+    private val json = Json { ignoreUnknownKeys = true }
+
     companion object {
         const val RADIO_URL = "https://station.spbchurch.ru/radio"
-        const val METADATA_URL = "https://station.spbchurch.ru/"
+        const val METADATA_URL = "https://station.spbchurch.ru/status-json.xsl"
         private const val METADATA_POLL_INTERVAL = 5000L
+        private const val DEFAULT_TITLE = "Прямой эфир"
+        private val STATION_PREFIXES = setOf(
+            "spbchurch",
+            "spbchurch radio",
+            "церковь преображение",
+            "радио"
+        )
     }
 
     fun initialize() {
@@ -65,13 +83,22 @@ class RadioStreamService(private val context: Context) {
                 override fun onIsPlayingChanged(playing: Boolean) {
                     _isPlaying.value = playing
                 }
+
+                override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+                    _artwork.value = mediaMetadata.artworkData
+                }
             })
         }
     }
 
     fun play() {
         initialize()
-        player?.play()
+        player?.let {
+            if (it.playbackState == Player.STATE_IDLE) {
+                it.prepare()
+            }
+            it.play()
+        }
         startMetadataPolling()
     }
 
@@ -129,29 +156,49 @@ class RadioStreamService(private val context: Context) {
         }
     }
 
-    private fun parseMetadata(html: String): String {
-        val patterns = listOf(
-            Regex("""Currently playing:\s*([^<"'\n]+)"""),
-            Regex("""stream_title['"]?\s*[=:]\s*['"]([^'"]+)['"]"""),
-            Regex("""Названи[её]\s*</[^>]*>\s*<[^>]*>([^<]+)</a>"""),
-            Regex("""<title>[^<]*-\s*([^<]+)</title>"""),
-            Regex("""playing\s*[=:]\s*['"]([^'"]+)['"]""")
-        )
+    private fun parseMetadata(body: String): String {
+        val raw = parseIcecastJson(body) ?: parseIcecastHtml(body) ?: return DEFAULT_TITLE
+        return cleanTitle(raw).ifBlank { DEFAULT_TITLE }
+    }
 
+    private fun parseIcecastJson(body: String): String? {
+        return try {
+            val root = json.parseToJsonElement(body).jsonObject
+            val source = root["icestats"]?.jsonObject?.get("source") ?: return null
+            val sourceObj = when (source) {
+                is JsonObject -> source
+                is JsonArray -> source.firstOrNull() as? JsonObject
+                else -> null
+            } ?: return null
+            sourceObj["title"]?.jsonPrimitive?.contentOrNull
+                ?: sourceObj["yp_currently_playing"]?.jsonPrimitive?.contentOrNull
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun parseIcecastHtml(body: String): String? {
+        val patterns = listOf(
+            Regex("""Currently playing:\s*</td>\s*<td[^>]*>([^<]+)</td>"""),
+            Regex("""<title>[^<]*-\s*([^<]+)</title>""")
+        )
         for (pattern in patterns) {
-            val match = pattern.find(html)
+            val match = pattern.find(body)
             if (match != null) {
-                val title = match.groupValues[1]
-                    .replace(Regex("""[|_\-]+"""), " ")
-                    .replace(Regex("""\s+"""), " ")
-                    .replace("SPBChurch Radio", "")
-                    .replace("Церковь Преображение", "")
-                    .trim()
-                if (title.isNotBlank()) {
-                    return title
-                }
+                val value = match.groupValues[1].trim()
+                if (value.isNotBlank()) return value
             }
         }
-        return "Радио"
+        return null
+    }
+
+    private fun cleanTitle(raw: String): String {
+        val trimmed = raw.trim()
+        val parts = trimmed.split(" - ", limit = 2).map { it.trim() }
+        return if (parts.size == 2) {
+            val (artist, title) = parts
+            if (artist.lowercase() in STATION_PREFIXES) title
+            else "$artist — $title"
+        } else trimmed
     }
 }

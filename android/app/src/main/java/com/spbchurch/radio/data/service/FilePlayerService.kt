@@ -36,6 +36,9 @@ class FilePlayerService(private val context: Context) {
     private val _playbackOrder = MutableStateFlow(PlaybackOrder.SHUFFLE)
     val playbackOrder: StateFlow<PlaybackOrder> = _playbackOrder.asStateFlow()
 
+    private val _artwork = MutableStateFlow<ByteArray?>(null)
+    val artwork: StateFlow<ByteArray?> = _artwork.asStateFlow()
+
     private var playlist: List<Track> = emptyList()
     private var currentIndex: Int = -1
     private var positionUpdateJob: Job? = null
@@ -62,6 +65,10 @@ class FilePlayerService(private val context: Context) {
                             stopPositionUpdates()
                         }
                     }
+
+                    override fun onMediaMetadataChanged(mediaMetadata: androidx.media3.common.MediaMetadata) {
+                        _artwork.value = mediaMetadata.artworkData
+                    }
                 })
             }
         }
@@ -86,6 +93,7 @@ class FilePlayerService(private val context: Context) {
             )
             .build()
 
+        _artwork.value = null
         player?.apply {
             setMediaItem(mediaItem)
             prepare()

@@ -1,20 +1,43 @@
 package com.spbchurch.radio.ui.screens.favorites
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.spbchurch.radio.R
-import com.spbchurch.radio.data.model.Track
-import com.spbchurch.radio.ui.components.*
+import com.spbchurch.radio.data.model.DownloadState
+import com.spbchurch.radio.ui.components.DownloadStateButton
+import com.spbchurch.radio.ui.components.FavoriteHeartButton
+import com.spbchurch.radio.ui.components.NeumorphicPlayChip
+import com.spbchurch.radio.ui.components.TrackListRow
+import com.spbchurch.radio.ui.components.TrackRowSubtitle
+import androidx.compose.material.icons.filled.Download
 import com.spbchurch.radio.viewmodel.MainViewModel
 
 @Composable
@@ -26,163 +49,127 @@ fun FavoritesScreen(
     val playbackState by viewModel.playbackState.collectAsStateWithLifecycle()
     val colors = MaterialTheme.colorScheme
 
-    var showDeleteDialog by remember { mutableStateOf<Track?>(null) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.favorites),
-                style = MaterialTheme.typography.headlineMedium,
-                color = colors.onSurface
-            )
+        Text(
+            text = "Избранное",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = colors.onBackground,
+            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+        )
 
-            if (favorites.isNotEmpty()) {
+        if (favorites.isEmpty()) {
+            EmptyFavoritesState()
+        } else {
+            Row(
+                modifier = Modifier.padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Favorite,
+                    contentDescription = null,
+                    tint = colors.primary,
+                    modifier = Modifier.size(12.dp)
+                )
+                Spacer(Modifier.width(6.dp))
                 Text(
-                    text = "${favorites.size} треков",
-                    style = MaterialTheme.typography.labelMedium,
+                    text = "${favorites.size} в избранном",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
                     color = colors.onSurfaceVariant
                 )
             }
-        }
 
-        if (favorites.isEmpty()) {
-            EmptyStateView(
-                icon = {
-                    Icon(
-                        Icons.Default.FavoriteBorder,
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp),
-                        tint = colors.onSurfaceVariant
-                    )
-                },
-                title = stringResource(R.string.no_favorites),
-                subtitle = "Добавляйте треки в избранное, нажимая на сердечко",
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
+            Spacer(Modifier.height(8.dp))
+
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(bottom = 100.dp)
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                contentPadding = PaddingValues(bottom = 120.dp)
             ) {
-                items(
-                    items = favorites,
-                    key = { it.id }
-                ) { track ->
-                    val isCurrentTrack = playbackState.currentTrack?.id == track.id
-                    val isPlaying = isCurrentTrack && playbackState.isPlaying && !playbackState.isRadioMode
+                items(items = favorites, key = { it.id }) { track ->
+                    val isCurrent = playbackState.currentTrack?.id == track.id
+                    val isPlaying = isCurrent && playbackState.isPlaying && !playbackState.isRadioMode
+                    val downloadState = viewModel.getDownloadState(track)
+                    val isDownloaded = downloadState == DownloadState.Downloaded
 
-                    FavoriteTrackRow(
+                    TrackListRow(
                         track = track,
+                        isCurrentTrack = isCurrent,
                         isPlaying = isPlaying,
-                        isCurrentTrack = isCurrentTrack,
+                        thumbnailIcon = Icons.Filled.Favorite,
+                        thumbnailTintCurrent = true,
+                        subtitle = if (isDownloaded) TrackRowSubtitle(
+                            Icons.Filled.Download, "Загружено"
+                        ) else null,
                         onPlay = {
                             viewModel.playTrack(track, favorites)
                             onTrackClick()
-                        },
-                        onFavorite = { viewModel.toggleFavorite(track) },
-                        onDelete = { showDeleteDialog = track }
-                    )
+                        }
+                    ) {
+                        DownloadStateButton(
+                            state = downloadState,
+                            progress = viewModel.getDownloadProgress(track),
+                            onDownload = { viewModel.downloadTrack(track) },
+                            onCancel = { viewModel.cancelDownload(track) }
+                        )
+                        FavoriteHeartButton(
+                            isFavorite = true,
+                            onClick = { viewModel.toggleFavorite(track) }
+                        )
+                        NeumorphicPlayChip(
+                            isCurrentTrack = isCurrent,
+                            isPlaying = isPlaying,
+                            onClick = {
+                                viewModel.playTrack(track, favorites)
+                                onTrackClick()
+                            }
+                        )
+                    }
                 }
             }
         }
-    }
-
-    showDeleteDialog?.let { track ->
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = null },
-            title = { Text("Удалить из избранного?") },
-            text = { Text("Трек \"${track.title}\" будет удалён из избранного.") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.toggleFavorite(track)
-                        showDeleteDialog = null
-                    }
-                ) {
-                    Text("Удалить", color = colors.error)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = null }) {
-                    Text("Отмена")
-                }
-            },
-            containerColor = colors.surface
-        )
     }
 }
 
 @Composable
-private fun FavoriteTrackRow(
-    track: Track,
-    isPlaying: Boolean,
-    isCurrentTrack: Boolean,
-    onPlay: () -> Unit,
-    onFavorite: () -> Unit,
-    onDelete: () -> Unit
-) {
+private fun EmptyFavoritesState() {
     val colors = MaterialTheme.colorScheme
-
-    MaterialCard(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onPlay
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(CircleShape)
+                .background(colors.background, CircleShape),
+            contentAlignment = Alignment.Center
         ) {
-            ArtworkView(
-                artworkUrl = null,
-                title = track.title,
-                size = 56.dp
+            Icon(
+                imageVector = Icons.Filled.FavoriteBorder,
+                contentDescription = null,
+                tint = colors.primary.copy(alpha = 0.5f),
+                modifier = Modifier.size(34.dp)
             )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = track.title,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (isCurrentTrack) colors.primary else colors.onSurface
-                )
-            }
-
-            IconButton(onClick = onFavorite) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Убрать из избранного",
-                    tint = colors.primary
-                )
-            }
-
-            IconButton(onClick = onDelete) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Удалить",
-                    tint = colors.error
-                )
-            }
-
-            IconButton(onClick = onPlay) {
-                Icon(
-                    imageVector = if (isCurrentTrack && isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                    contentDescription = "Воспроизвести",
-                    tint = if (isCurrentTrack) colors.primary else colors.onSurfaceVariant,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
         }
+        Spacer(Modifier.height(16.dp))
+        Text(
+            "Нет избранных треков",
+            fontSize = 17.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = colors.onBackground
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Нажмите ♡ на экране плеера,\nчтобы добавить трек сюда",
+            fontSize = 14.sp,
+            color = colors.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
     }
 }
