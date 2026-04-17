@@ -21,21 +21,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Cache Android SDK
-        uses: actions/cache@v4
-        with:
-          path: ~/android-sdk
-          key: ${{ runner.os }}-android-sdk-${{ hashFiles('**/build.gradle.kts') }}
-          restore-keys: |
-            ${{ runner.os }}-android-sdk-
+      - name: Clear Gradle cache
+        run: |
+          rm -rf ~/.gradle/caches
+          rm -rf ~/.gradle/daemon
+          rm -rf ~/android-sdk
 
       - name: Accept Android licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
@@ -44,7 +34,7 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew clean assembleDebug --no-daemon --no-build-cache --refresh-dependencies
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -57,7 +47,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
         run: |
           cd android
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease --no-daemon --no-build-cache
 
       - name: Upload release APK
         if: github.ref == 'refs/heads/master'
